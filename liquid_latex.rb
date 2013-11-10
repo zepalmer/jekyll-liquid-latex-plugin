@@ -63,7 +63,7 @@ module Jekyll
       end
 
       def execute_cmd(cmd)
-        cmd = cmd.gsub("\$density", @p["density"])
+        cmd = cmd.gsub("\$density", @p["density"].to_s)
         cmd = cmd.gsub("\$texfile", @p["tex_fn"])
         cmd = cmd.gsub("\$dvifile", @p["dvi_fn"])
         cmd = cmd.gsub("\$epsfile", @p["eps_fn"])
@@ -82,7 +82,7 @@ module Jekyll
         @p["density"] = @@globals["density"] unless @p.key?("density")
         @p["usepackages"] = (@@globals["usepackages"].split(",") + @p["usepackages"].split(",")).join(",")
         # if this LaTeX code is already compiled, skip its compilation
-        hash_txt = @p["density"] + @p["usepackages"] + latex_source
+        hash_txt = @p["density"].to_s + @p["usepackages"].to_s + latex_source
         filename = Digest::MD5.hexdigest(hash_txt) + ".png"
         @p["png_fn"] = File.join(@@globals["src_dir"], filename)
         ok = true
