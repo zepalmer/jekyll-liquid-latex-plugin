@@ -35,7 +35,7 @@ There are several configuration parameters that you can define in your `_config.
 
 An explanation of those parameters follows:
 
-*   **`debug`** (`true` or `false`): 
+*   __`debug`__ (`true` or `false`): 
 
     Activates the debug mode with which you can see the compilation commands that are executed during build. 
 
