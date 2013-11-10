@@ -6,7 +6,7 @@ jekyll-liquid-latex-plugin
 Installation
 ============
 
-Just copy the `liquid_latex.rb` to the `_plugins` folder.
+Just copy the `liquid_latex.rb` file to your `_plugins` folder.
 
 Requirements
 ============
@@ -56,6 +56,23 @@ This variables makes you able to choose which software you use for the whole con
 
 If your don't use a certain parameter, it will take the default value. If you are happy with all the default values you can omit the `liquid-latex` section in your `_config.xml`.
 
+Usage
+=====
+
+The tag can be modified by the use of two parameters:
+
+* `density` overrides the default density set in the `_config.yml` file or the internal default value. The value put here will take precedence.
+
+* `usepackages` adds a list of packages to the ones set in the `_config.yml` file. This allows you to fix some common packages in the global configuration of the site and specify additional ones as you need them in each tag.
+
+Both parameters must be specified in a `variable=value` style. For example:
+
+{% raw %}
+    {% latex density=100 usepackages=pst-all,pst-3dplot %}
+    ...
+    {% endlatex %}
+{% endraw %}
+
 Sample usage
 ============
 
@@ -75,7 +92,11 @@ You can type the following block of LaTeX inside one of your posts:
     \end{sudoku}
     {% endlatex %}
 
-And you will get that sudoku rendered by the `sudoku` package. Don't forget to install the `sudoku` package in your LaTeX installation before trying to build your site. If not, the build process will stop and you'll get the original LaTeX code inside your post as a block of code. That's how this plugin will behave when your LaTeX code contains errors.
+And you will get that sudoku rendered by the `sudoku` package:
+
+![Sample](sample.png)
+
+If you copy this example, don't forget to install the `sudoku` package in your LaTeX installation before trying to build your site. If not, the build process will stop and you'll get the original LaTeX code inside your post as a block of code. That's how this plugin will behave when your LaTeX code contains errors and cannot be compiled.
 
 In this case, you would probably need to install the `sudoku` package by executing:
 
@@ -84,4 +105,4 @@ In this case, you would probably need to install the `sudoku` package by executi
 More information
 ================
 
-Take a look at my [http://www.flx.cat](http://www.flx.cat) site!
+Take a look at my [http://www.flx.cat/jekyll/2013/11/10/liquid-latex-jekyll-plugin.html](http://www.flx.cat/jekyll/2013/11/10/liquid-latex-jekyll-plugin.html) blog entry!
