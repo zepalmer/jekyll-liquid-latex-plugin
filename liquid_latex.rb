@@ -83,7 +83,7 @@ module Jekyll
         @p["usepackages"] = (@@globals["usepackages"].split(",") + @p["usepackages"].split(",")).join(",")
         # if this LaTeX code is already compiled, skip its compilation
         hash_txt = @p["density"].to_s + @p["usepackages"].to_s + latex_source
-        filename = Digest::MD5.hexdigest(hash_txt) + ".png"
+        filename = "latex-" + Digest::MD5.hexdigest(hash_txt) + ".png"
         @p["png_fn"] = File.join(@@globals["src_dir"], filename)
         ok = true
         if !File.exists?(@p["png_fn"])
@@ -132,10 +132,11 @@ module Jekyll
   end
 
   class Site
-    alias :super_write :write
+    # Alias for the parent Site::write method (ingenious static override)
+    alias :super_latex_write :write
 
     def write
-      super_write
+      super_latex_write   # call the super method
       Tags::LatexBlock::init_globals(self)
       dest_folder = File.join(dest, Tags::LatexBlock::latex_output_directory)
       FileUtils.mkdir_p(dest_folder) unless File.exists?(dest_folder)
@@ -145,7 +146,7 @@ module Jekyll
       Tags::LatexBlock::generated_files.each do |f|
         src_files << f.path
       end
-      pre_files = Dir.glob(File.join(source, Tags::LatexBlock::latex_output_directory, "*"))
+      pre_files = Dir.glob(File.join(source, Tags::LatexBlock::latex_output_directory, "latex-*.png"))
       to_remove = pre_files - src_files
       to_remove.each do |f|
         File.unlink f if File.exists?(f)

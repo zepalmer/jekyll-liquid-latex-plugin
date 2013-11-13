@@ -102,6 +102,29 @@ In this case, you would probably need to install the `sudoku` package by executi
 
     sudo tlmgr install sudoku
 
+Notes
+=====
+
+*   The plugin doesn't recompile a previously rendered block of LaTeX. It takes into consideration a change in the text or a change in the arguments (density and packages used). This reduces the total time of the building process.
+
+    Aside, you can delete all the contents of your LaTeX generated blocks in the source directory if you want to make a backup copy of your site. It will be completelly regenerated when you rebuild your site.
+
+*   Also, this plugin keeps the folder of generated images in a clean state. That is, there will be only those images that are used in your site. All previously generated images will be deleted if they are detected as orphaned from the posts.
+
+*   If you are trying to generate a picture with PSTricks, I recommend to insert the PSTricks code inside a TeXtoEPS environment. This ensures a perfect crop of the generated image.
+
+For example:
+
+{% raw %}
+    {% latex density=72 usepackages=pst-all,pst-eps %}
+    \begin{TeXtoEPS}
+    \begin{pspicture}(0,0)(7,2)
+    \psframe(0,0)(7,2) \psline(0,0)(7,2) \psline(7,0)(0,2)
+    \end{pspicture}
+    \end{TeXtoEPS}
+    {% endlatex %}
+{% endraw %}
+
 More information
 ================
 
