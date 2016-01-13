@@ -1,3 +1,6 @@
+# Original source of this file: https://github.com/fgalindo/jekyll-liquid-latex-plugin
+# Modified to generate files in the same directory as the document containing the liquid tag
+
 require "digest"
 require "fileutils"
 
@@ -14,18 +17,11 @@ module Jekyll
         "dvips_cmd" => "dvips -E $dvifile -o $epsfile > /dev/null 2>&1",
         "convert_cmd" => "convert -density $density $epsfile $pngfile > /dev/null 2>&1",
         "temp_filename" => "latex_temp",
-        "output_directory" => "/latex",
-        "src_dir" => "",
-        "dst_dir" => ""
       }
 
       @@generated_files = [ ]
       def self.generated_files
         @@generated_files
-      end
-
-      def self.latex_output_directory
-        @@globals["output_directory"]
       end
 
       def initialize(tag_name, text, tokens)
@@ -55,10 +51,6 @@ module Jekyll
           @@globals.keys.each do |k|
             read_config(k, site)
           end
-          @@globals["src_dir"] = File.join(site.config["source"], @@globals["output_directory"])
-          @@globals["dst_dir"] = File.join(site.config["destination"], @@globals["output_directory"])
-          # Verify and prepare the output folder if it doesn't exist
-          FileUtils.mkdir_p(@@globals["src_dir"]) unless File.exists?(@@globals["src_dir"])
         end
       end
 
@@ -84,7 +76,12 @@ module Jekyll
         # if this LaTeX code is already compiled, skip its compilation
         hash_txt = @p["density"].to_s + @p["usepackages"].to_s + latex_source
         filename = "latex-" + Digest::MD5.hexdigest(hash_txt) + ".png"
-        @p["png_fn"] = File.join(@@globals["src_dir"], filename)
+        in_site_path = context.registers[:page]["dir"]
+        dirname = File.join(site.source, in_site_path)
+        unless File.directory?(dirname)
+          FileUtils.mkdir_p(dirname)
+        end
+        @p["png_fn"] = File.join(dirname, filename)
         ok = true
         if !File.exists?(@p["png_fn"])
           puts "Compiling with LaTeX..." if @@globals["debug"]
@@ -115,12 +112,11 @@ module Jekyll
 
         if ok
           # Add the file to the list of static files for the final copy once generated
-          st_file = Jekyll::StaticFile.new(site, site.source, @@globals["output_directory"], filename)
+          st_file = Jekyll::StaticFile.new(site, site.source, in_site_path, filename)
           @@generated_files << st_file
           site.static_files << st_file
           # Build the <img> tag to be returned to the renderer
-          png_path = File.join(@@globals["output_directory"], filename)
-          return "<img src=\"" + png_path + "\" />"
+          return "<img src=\"" + filename + "\" />"
         else
           # Generate a block of text in the post with the original source
           resp = "Failed to render the following block of LaTeX:<br/>\n"
@@ -138,21 +134,16 @@ module Jekyll
     def write
       super_latex_write   # call the super method
       Tags::LatexBlock::init_globals(self)
-      dest_folder = File.join(dest, Tags::LatexBlock::latex_output_directory)
-      FileUtils.mkdir_p(dest_folder) unless File.exists?(dest_folder)
 
       # clean all previously rendered files not rendered in the actual build
       src_files = []
       Tags::LatexBlock::generated_files.each do |f|
         src_files << f.path
       end
-      pre_files = Dir.glob(File.join(source, Tags::LatexBlock::latex_output_directory, "latex-*.png"))
+      pre_files = Dir.glob(File.join(source, "**", "latex-*.png"))
       to_remove = pre_files - src_files
       to_remove.each do |f|
         File.unlink f if File.exists?(f)
-        d, fn = File.split(f)
-        df = File.join(dest, Tags::LatexBlock::latex_output_directory, fn)
-        File.unlink df if File.exists?(df)
       end
     end
   end

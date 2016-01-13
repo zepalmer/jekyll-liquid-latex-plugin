@@ -3,6 +3,13 @@ jekyll-liquid-latex-plugin
 
 [Jekyll](http://Jekyllrb.com/) plugin that defines a useful Liquid Tag for rendering blocks of [LaTeX](http://en.wikipedia.org/wiki/LaTeX‎) code inside a post
 
+This Fork
+=========
+
+This version of the plugin was forked from the [original repository](https://github.com/fgalindo/jekyll-liquid-latex-plugin) to modify the location of generated image files.  The original plugin places all image files in a dedicated output directory on the site, but this requires the site to exist at the root of its domain.  This modified version of the plugin places the generated image files in the output directory of the document; thus, a file `foo/02.md` would generate files in `foo/02/` so that they may be accessed via relative paths in the resulting `foo/02/index.html`.
+
+None of the above should require any work on the part of the plugin user; it is sufficient to write `{%latex%}` liquid tags and enjoy the resulting generated image.  (Adding `latex-*.png` to your `.gitignore` is recommendable, though.)
+
 Installation
 ============
 
@@ -27,7 +34,6 @@ There are several configuration parameters that you can define in your `_config.
       debug: false
       density: 300
       usepackages: pst-all,pst-3dplot
-      output_directory: /res/latex
       latex_cmd: "latex -interaction=nonstopmode $texfile &> /dev/null"
       dvips_cmd: "dvips -E $dvifile -o $epsfile &> /dev/null"
       convert_cmd: "convert -density $density $epsfile $pngfile &> /dev/null"
@@ -38,7 +44,6 @@ An explanation of those parameters follows:
 *   `debug` (boolean): Activates the debug mode with which you can see the compilation commands that are executed during build. Default value: `false`
 *   `density` (numeric): Density for the conversion of PostScript (EPS) to PNG. Default value:`300`
 *   `usepackages` (list of comma-separated strings): Name of the packages that will be passed globally to each block of LaTeX code. They will be added individually to their corresponding `\usepackage{...}` lines in the temporary $\LaTeX$ file. Default value: empty string (no packages)
-*   `output_directory` (web path): Path in which the generated PNG will be placed. Default value: `/latex`
 *   `temp_filename` (string): Name of the temporary file that will be generated for the compilation process. Default value: `latex_temp`
 *   `latex_cmd` (string): Command line to execute for the `.tex` to `.div` conversion. Default value: `latex -interaction=nonstopmode $texfile &> /dev/null`
 *   `dvips_cmd` (string): Command line to execute for the `.dvi` to `.eps` conversion. Default value: `dvips -E $dvifile -o $epsfile &> /dev/null`
